@@ -112,7 +112,6 @@ const Navbar: React.FC = () => {
         </div>
       </nav>
 
-      <div style={{ padding: "24px", maxWidth: "960px", margin: "0 auto" }}></div>
     </div>
   );
 };
