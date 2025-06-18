@@ -6,16 +6,17 @@ import { getUserById } from "@/features/user/user.service";
 import { User } from "@/features/user/user.interface";
 
 const Navbar: React.FC = () => {
-  const { user, logoutUser } = useAuth();  // Obtendo o usuário do contexto de autenticação
+  const { user, logoutUser } = useAuth();
   const router = useRouter();
   const [userData, setUserData] = useState<User | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!user) {
+    // Verificar se o token está presente no localStorage
+    if (!localStorage.getItem("token")) {
       router.push("/login");
-    } else {
-      // Buscando os dados do usuário
+    } else if (user && user.id) {
+      // Caso o usuário esteja autenticado, buscar dados do usuário
       getUserById(user.id)
         .then((userData) => {
           setUserData(userData);
@@ -24,7 +25,7 @@ const Navbar: React.FC = () => {
           console.error("Erro ao buscar dados do usuário:", error);
         });
     }
-  }, [user, router]);
+  }, [user, router]); // A dependência de `user` garante que o efeito execute quando o `user` mudar
 
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
@@ -35,8 +36,9 @@ const Navbar: React.FC = () => {
     router.push("/login");
   };
 
+  // Verificar se o usuário existe antes de exibir a Navbar
   if (!user) {
-    return null;  // Se não houver usuário logado, a Navbar não será exibida
+    return null;
   }
 
   return (
@@ -110,9 +112,7 @@ const Navbar: React.FC = () => {
         </div>
       </nav>
 
-      <div style={{ padding: "24px", maxWidth: "960px", margin: "0 auto" }}>
-        {/* Additional content can go here */}
-      </div>
+      <div style={{ padding: "24px", maxWidth: "960px", margin: "0 auto" }}></div>
     </div>
   );
 };
