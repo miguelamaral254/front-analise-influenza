@@ -32,35 +32,110 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "#f8fafc" }}>
-      <div style={{ maxWidth: "400px", width: "100%", padding: "2rem", backgroundColor: "white", borderRadius: "8px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" }}>
-        <h2 style={{ textAlign: "center", marginBottom: "1.5rem", fontSize: "24px", fontWeight: "600" }}>Login</h2>
+    <div style={{ display: "flex", height: "100vh" }}>
+      {/* Fundo azul à esquerda com círculos e texto centralizado */}
+      <div style={{
+        flex: 1,
+        backgroundColor: "#2563eb",
+        position: "relative",
+        color: "white",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        padding: "2rem",
+        textAlign: "center",  // Centraliza o texto
+      }}>
+        {/* Círculos no fundo */}
+        <div style={{
+          position: "absolute",
+          top: "-100px",
+          left: "-150px",
+          width: "300px",
+          height: "300px",
+          borderRadius: "50%",
+          backgroundColor: "rgba(255, 255, 255, 0.2)",
+        }}></div>
+
+        <div style={{
+          position: "absolute",
+          bottom: "-150px",
+          right: "-150px",
+          width: "400px",
+          height: "400px",
+          borderRadius: "50%",
+          backgroundColor: "rgba(255, 255, 255, 0.2)",
+        }}></div>
+
+        {/* Texto no fundo azul */}
+        <h1 style={{ fontSize: "36px", fontWeight: "700", marginBottom: "1rem" }}>HOPES</h1>
+        <h3 style={{ fontSize: "24px", fontWeight: "500", marginBottom: "1.5rem" }}>
+          Sistema de Previsão e Otimização de Recursos Hospitalares
+        </h3>
+        <h4 style={{ fontSize: "20px", fontWeight: "400", color: "#1e3a8a" }}>
+          Para casos de gripe influenza no nordeste brasileiro
+        </h4>
+      </div>
+
+      {/* Formulário de login à direita */}
+      <div
+        style={{
+          maxWidth: "400px",
+          width: "100%",
+          padding: "2rem",
+          backgroundColor: "white",
+          borderRadius: "8px",
+          margin: "auto",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+        }}
+      >
+        <h2 style={{ textAlign: "center", marginBottom: "1.5rem", fontSize: "24px", fontWeight: "600" }}>
+          Login
+        </h2>
 
         {error && <div style={{ marginBottom: "1rem", color: "#dc2626", fontSize: "14px" }}>{error}</div>}
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "1.5rem" }}>
-            <label htmlFor="email" style={{ display: "block", marginBottom: "0.5rem", fontSize: "14px", fontWeight: "500" }}>Email</label>
+            <label htmlFor="email" style={{ display: "block", marginBottom: "0.5rem", fontSize: "14px", fontWeight: "500" }}>
+              Email
+            </label>
             <input
               type="email"
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={{ width: "100%", padding: "0.75rem", borderRadius: "0.375rem", border: "1px solid #d1d5db", fontSize: "14px" }}
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+                borderRadius: "0.375rem",
+                border: "1px solid #d1d5db",
+                fontSize: "14px",
+              }}
               placeholder="Digite seu Email"
             />
           </div>
 
           <div style={{ marginBottom: "1.5rem" }}>
-            <label htmlFor="password" style={{ display: "block", marginBottom: "0.5rem", fontSize: "14px", fontWeight: "500" }}>Senha</label>
+            <label htmlFor="password" style={{ display: "block", marginBottom: "0.5rem", fontSize: "14px", fontWeight: "500" }}>
+              Senha
+            </label>
             <input
               type="password"
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              style={{ width: "100%", padding: "0.75rem", borderRadius: "0.375rem", border: "1px solid #d1d5db", fontSize: "14px" }}
+              style={{
+                width: "100%",
+                padding: "0.75rem",
+                borderRadius: "0.375rem",
+                border: "1px solid #d1d5db",
+                fontSize: "14px",
+              }}
               placeholder="Digite sua senha"
             />
           </div>

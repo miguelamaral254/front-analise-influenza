@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"; 
+"use client";
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
@@ -14,10 +14,13 @@ ChartJS.register(
   Legend
 );
 
-const LeitosDashboard: React.FC = () => {
+interface LeitosDashboardProps {
+  selectedState: string;
+  selectedYear: number;
+}
+
+const LeitosDashboard: React.FC<LeitosDashboardProps> = ({ selectedState, selectedYear }) => {
   const [leitosData, setLeitosData] = useState<any[]>([]);
-  const [selectedState, setSelectedState] = useState<string>("");
-  const [selectedYear, setSelectedYear] = useState<number>(2020);
 
   useEffect(() => {
     const fetchLeitosData = async () => {
@@ -36,14 +39,6 @@ const LeitosDashboard: React.FC = () => {
     fetchLeitosData();
   }, []);
   
-  const handleStateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedState(event.target.value);
-  };
-
-  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedYear(Number(event.target.value));
-  };
-
   const filteredData = leitosData.filter((item) =>
     (selectedState ? item.uf === selectedState : true) && item.ano === selectedYear
   );
@@ -72,57 +67,6 @@ const LeitosDashboard: React.FC = () => {
 
   return (
     <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
-      <div style={{ display: "flex", gap: "24px", marginBottom: "24px" }}>
-        <div style={{ flex: 1 }}>
-          <label htmlFor="state-select" style={{ marginRight: "12px", display: "block", fontSize: "16px", fontWeight: "600" }}>
-            Estado (UF):
-          </label>
-          <select
-            id="state-select"
-            value={selectedState}
-            onChange={handleStateChange}
-            style={{
-              padding: "8px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-              width: "100%",
-              fontSize: "16px",
-            }}
-          >
-            <option value="">Todos</option>
-            {[...new Set(leitosData.map((item) => item.uf))].map((uf) => (
-              <option key={uf} value={uf}>
-                {uf}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div style={{ flex: 1 }}>
-          <label htmlFor="year-select" style={{ marginRight: "12px", display: "block", fontSize: "16px", fontWeight: "600" }}>
-            Ano:
-          </label>
-          <select
-            id="year-select"
-            value={selectedYear}
-            onChange={handleYearChange}
-            style={{
-              padding: "8px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-              width: "100%",
-              fontSize: "16px",
-            }}
-          >
-            <option value={2020}>2020</option>
-            <option value={2021}>2021</option>
-            <option value={2022}>2022</option>
-            <option value={2023}>2023</option>
-            <option value={2024}>2024</option>
-          </select>
-        </div>
-      </div>
-
       <div
         style={{
           border: "1px solid #e2e8f0",

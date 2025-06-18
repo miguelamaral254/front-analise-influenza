@@ -1,8 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 import { searchInfluenza } from "./influenza.service";
+import LeitosDashboard from "../auth/leitos/LeitosDashboard";
+import OverloadRisk from "./OverloadRisk"; // Importe o componente OverloadRisk
+import { searchLeitosSusNaoSUS } from "../auth/leitos/leitos.service";
 
 ChartJS.register(
   CategoryScale,
@@ -15,27 +19,31 @@ ChartJS.register(
 
 const InfluenzaDashboard: React.FC = () => {
   const [influenzaData, setInfluenzaData] = useState<any[]>([]);
+  const [leitosData, setLeitosData] = useState<any[]>([]); 
   const [selectedState, setSelectedState] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<number>(2020);
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
 
   useEffect(() => {
-    const fetchInfluenzaData = async () => {
+    const fetchData = async () => {
       try {
-        const data = await searchInfluenza();
-        if (data && data.data && data.data.content && Array.isArray(data.data.content)) {
-          setInfluenzaData(data.data.content);
-        } else {
-          console.error("Erro: dados não encontrados ou estrutura inválida.", data);
+        const influenzaResponse = await searchInfluenza();
+        if (influenzaResponse && influenzaResponse.data && influenzaResponse.data.content) {
+          setInfluenzaData(influenzaResponse.data.content);
+        }
+
+        const leitosResponse = await searchLeitosSusNaoSUS(); 
+        if (leitosResponse && leitosResponse.data && leitosResponse.data.content) {
+          setLeitosData(leitosResponse.data.content);
         }
       } catch (error) {
-        console.error("Erro ao carregar dados de influenza:", error);
+        console.error("Erro ao carregar dados", error);
       }
     };
-  
-    fetchInfluenzaData();
+
+    fetchData();
   }, []);
-  
+
   const handleStateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedState(event.target.value);
   };
@@ -81,7 +89,6 @@ const InfluenzaDashboard: React.FC = () => {
     ? `Internações por Influenza por mês para ${selectedYear}` 
     : `Internações por Influenza em ${selectedMonth.toUpperCase()} (${selectedYear})`;
 
-  // Calcular pico de internação por estado e mês
   const peakData = filteredData.map((item) => {
     const monthlyData = months.map((month) => item[month] || 0);
     const maxPeak = Math.max(...monthlyData);
@@ -114,7 +121,7 @@ const InfluenzaDashboard: React.FC = () => {
   const chartTitleForPeak = `Picos de Internação por Sazonalidade em ${selectedYear}`;
 
   return (
-    <div style={{ padding: "24px", maxWidth: "1920px", margin: "0 auto" }}>
+    <div style={{ padding: "4px", width:"100%",margin: "0 auto" }}>
       <div style={{ display: "flex", gap: "24px", marginBottom: "24px" }}>
         <div style={{ flex: 1 }}>
           <label htmlFor="state-select" style={{ marginRight: "12px", display: "block", fontSize: "16px", fontWeight: "600" }}>
@@ -213,27 +220,43 @@ const InfluenzaDashboard: React.FC = () => {
               {chartTitle}
             </h2>
             {filteredData.length > 0 ? <Bar data={chartData} /> : <p>No data available for selected filters</p>}
+            
           </div>
+          <div style={{ marginTop: "24px" }}>
+        <OverloadRisk
+          influenzaData={influenzaData}
+          leitosData={leitosData}
+          selectedState={selectedState}
+          selectedYear={selectedYear}
+        />
+      </div>
         </div>
 
-        <div style={{ flex: 1 }}>
-          <div
-            style={{
-              border: "1px solid #e2e8f0",
-              borderRadius: "8px",
-              padding: "16px",
-              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-              backgroundColor: "white",
-              height: "fit-content",
-            }}
-          >
-            <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px" }}>
-              {chartTitleForPeak}
-            </h2>
-            <Bar data={peakChartData} />
+        <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ flex: 1 }}>
+            <div
+              style={{
+                border: "1px solid #e2e8f0",
+                borderRadius: "8px",
+                padding: "16px",
+                boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                backgroundColor: "white",
+                maxWidth:"600px"
+              }}
+            >
+              <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px" }}>
+                {chartTitleForPeak}
+              </h2>
+              <Bar data={peakChartData} />
+            </div>
+          </div>
+
+          <div style={{ flex: 1 }}>
+            <LeitosDashboard selectedState={selectedState} selectedYear={selectedYear} />
           </div>
         </div>
       </div>
+      
     </div>
   );
 };

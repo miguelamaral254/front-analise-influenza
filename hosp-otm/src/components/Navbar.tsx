@@ -36,16 +36,15 @@ const Navbar: React.FC = () => {
     router.push("/login");
   };
 
-  // Verificar se o usuário existe antes de exibir a Navbar
   if (!user) {
     return null;
   }
 
   return (
     <div>
-      <nav style={{ backgroundColor: "#2d3748", padding: "16px" }}>
+      <nav style={{ backgroundColor: "#2d3748", width:"100%", padding: "16px" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ color: "white", fontSize: "24px" }}>Otimizador Hospitalar</div>
+          <div style={{ color: "white", fontSize: "24px" }}>Hopes</div>
           <div style={{ position: "relative" }}>
             <img
               src={userData?.imageUrl || "default-avatar.jpg"}
@@ -68,7 +67,7 @@ const Navbar: React.FC = () => {
                 }}
               >
                 <div style={{ padding: "16px" }}>
-                  <p style={{ fontSize: "18px", fontWeight: "600" }}>Hello, {userData?.name}</p>
+                  <p style={{ fontSize: "18px", fontWeight: "600" }}>Olá, {userData?.name}</p>
                   <button
                     onClick={() => router.push("/settings")}
                     style={{
