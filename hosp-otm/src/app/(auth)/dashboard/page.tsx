@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/useContext";
 import { useRouter } from "next/navigation";
 import InfluenzaDashboard from "@/features/influenza/InfluenzaDashboard";
+import LeitosDashboard from "@/features/auth/leitos/LeitosDashboard";
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -27,7 +28,7 @@ const Dashboard: React.FC = () => {
     <div style={{ display: "flex", height: "100vh" }}>
       <div
         style={{
-          width: "250px",
+          width: "150px",
           backgroundColor: "#f0f4f8",
           padding: "20px",
           display: "flex",
@@ -53,18 +54,18 @@ const Dashboard: React.FC = () => {
           Dashboard Influenza
         </button>
         <button
-          onClick={() => handleTabClick("another")}
+          onClick={() => handleTabClick("leitosDashboard")}
           style={{
             width: "100%",
             padding: "12px",
-            backgroundColor: activeTab === "another" ? "#4CAF50" : "#ddd",
+            backgroundColor: activeTab === "leitosDashboard" ? "#4CAF50" : "#ddd",
             color: "#fff",
             border: "none",
             marginBottom: "10px",
             cursor: "pointer",
           }}
         >
-          Another Tab
+          Leitos
         </button>
       </div>
 
@@ -73,12 +74,13 @@ const Dashboard: React.FC = () => {
           flex: 1,
           padding: "20px",
           backgroundColor: "#fff",
-          height: "100%",
+          height: "110%",
           overflow: "hidden",
+     
         }}
       >
         {activeTab === "influenzaDashboard" && <InfluenzaDashboard />}
-        {activeTab === "another" && <div>Another Content</div>}
+        {activeTab === "leitosDashboard" && <LeitosDashboard />}
       </div>
     </div>
   );

@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-"use client"; 
+"use client";
 import React, { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
@@ -79,11 +78,43 @@ const InfluenzaDashboard: React.FC = () => {
   };
 
   const chartTitle = selectedMonth === "all" 
-    ? `Casos de Influenza por mês para ${selectedYear}` 
-    : `Casos de Influenza em ${selectedMonth.toUpperCase()} (${selectedYear})`;
+    ? `Internações por Influenza por mês para ${selectedYear}` 
+    : `Internações por Influenza em ${selectedMonth.toUpperCase()} (${selectedYear})`;
+
+  // Calcular pico de internação por estado e mês
+  const peakData = filteredData.map((item) => {
+    const monthlyData = months.map((month) => item[month] || 0);
+    const maxPeak = Math.max(...monthlyData);
+    const peakMonthIndex = monthlyData.indexOf(maxPeak);
+    const peakMonth = months[peakMonthIndex];
+    return {
+      uf: item.uf,
+      peak: maxPeak,
+      peakMonth,
+    };
+  });
+
+  const peakChartData = {
+    labels: peakData.map((item) => `${item.uf} (${item.peakMonth.toUpperCase()})`),
+    datasets: [
+      {
+        label: `Picos de internação em ${selectedYear}`,
+        data: peakData.map((item) => item.peak),
+        backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
+        borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+        borderWidth: 1,
+      },
+    ],
+    options: {
+      indexAxis: 'y',  // Usar barras horizontais
+      responsive: true,
+    },
+  };
+
+  const chartTitleForPeak = `Picos de Internação por Sazonalidade em ${selectedYear}`;
 
   return (
-    <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
+    <div style={{ padding: "24px", maxWidth: "1920px", margin: "0 auto" }}>
       <div style={{ display: "flex", gap: "24px", marginBottom: "24px" }}>
         <div style={{ flex: 1 }}>
           <label htmlFor="state-select" style={{ marginRight: "12px", display: "block", fontSize: "16px", fontWeight: "600" }}>
@@ -167,19 +198,41 @@ const InfluenzaDashboard: React.FC = () => {
         </div>
       </div>
 
-      <div
-        style={{
-          border: "1px solid #e2e8f0",
-          borderRadius: "8px",
-          padding: "16px",
-          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-          backgroundColor: "white",
-        }}
-      >
-        <h2 style={{ fontSize: "24px", fontWeight: "600", marginBottom: "16px" }}>
-          {chartTitle}
-        </h2>
-        {filteredData.length > 0 ? <Bar data={chartData} /> : <p>No data available for selected filters</p>}
+      <div style={{ display: "flex", gap: "24px", marginBottom: "16px" }}>
+        <div style={{ flex: 2 }}>
+          <div
+            style={{
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
+              padding: "16px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              backgroundColor: "white",
+            }}
+          >
+            <h2 style={{ fontSize: "24px", fontWeight: "600", marginBottom: "16px" }}>
+              {chartTitle}
+            </h2>
+            {filteredData.length > 0 ? <Bar data={chartData} /> : <p>No data available for selected filters</p>}
+          </div>
+        </div>
+
+        <div style={{ flex: 1 }}>
+          <div
+            style={{
+              border: "1px solid #e2e8f0",
+              borderRadius: "8px",
+              padding: "16px",
+              boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+              backgroundColor: "white",
+              height: "fit-content",
+            }}
+          >
+            <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "12px" }}>
+              {chartTitleForPeak}
+            </h2>
+            <Bar data={peakChartData} />
+          </div>
+        </div>
       </div>
     </div>
   );
