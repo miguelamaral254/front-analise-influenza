@@ -1,0 +1,184 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+"use client"; 
+import React, { useEffect, useState } from "react";
+import { Bar } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
+import { searchInfluenza } from "./influenza.service";
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+const InfluenzaDashboard: React.FC = () => {
+  const [influenzaData, setInfluenzaData] = useState<any[]>([]);
+  const [selectedState, setSelectedState] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<number>(2020);
+  const [selectedMonth, setSelectedMonth] = useState<string>("all");
+
+  useEffect(() => {
+    const fetchInfluenzaData = async () => {
+      try {
+        const data = await searchInfluenza();
+        if (data && data.data && data.data.content && Array.isArray(data.data.content)) {
+          setInfluenzaData(data.data.content);
+        } else {
+          console.error("Erro: dados não encontrados ou estrutura inválida.", data);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar dados de influenza:", error);
+      }
+    };
+  
+    fetchInfluenzaData();
+  }, []);
+  
+  const handleStateChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedState(event.target.value);
+  };
+
+  const handleYearChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedYear(Number(event.target.value));
+  };
+
+  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMonth(event.target.value);
+  };
+
+  const filteredData = influenzaData.filter((item) =>
+    (selectedState ? item.uf === selectedState : true) && item.ano === selectedYear
+  );
+
+  const months = [
+    "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"
+  ];
+
+  const chartData = {
+    labels: filteredData.map((item) => item.uf),
+    datasets: selectedMonth === "all"
+      ? months.map((month) => ({
+          label: `${month.toUpperCase()} (${selectedYear})`,
+          data: filteredData.map((item) => item[month]),
+          backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
+          borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+          borderWidth: 1,
+        }))
+      : [
+          {
+            label: `${selectedMonth.toUpperCase()} (${selectedYear})`,
+            data: filteredData.map((item) => item[selectedMonth]),
+            backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.2)`,
+            borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
+            borderWidth: 1,
+          },
+      ],
+  };
+
+  const chartTitle = selectedMonth === "all" 
+    ? `Casos de Influenza por mês para ${selectedYear}` 
+    : `Casos de Influenza em ${selectedMonth.toUpperCase()} (${selectedYear})`;
+
+  return (
+    <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
+      <h1 style={{ fontSize: "32px", fontWeight: "700", textAlign: "center", marginBottom: "32px" }}>
+        Influenza Dashboard
+      </h1>
+
+      <div style={{ marginBottom: "24px" }}>
+        <label htmlFor="state-select" style={{ marginRight: "12px" }}>
+          Estado (UF):
+        </label>
+        <select
+          id="state-select"
+          value={selectedState}
+          onChange={handleStateChange}
+          style={{
+            padding: "8px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        >
+          <option value="">Todos</option>
+          {[...new Set(influenzaData.map((item) => item.uf))].map((uf) => (
+            <option key={uf} value={uf}>
+              {uf}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div style={{ marginBottom: "24px" }}>
+        <label htmlFor="year-select" style={{ marginRight: "12px" }}>
+          Ano:
+        </label>
+        <select
+          id="year-select"
+          value={selectedYear}
+          onChange={handleYearChange}
+          style={{
+            padding: "8px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        >
+          <option value={2020}>2020</option>
+          <option value={2021}>2021</option>
+          <option value={2022}>2022</option>
+          <option value={2023}>2023</option>
+          <option value={2024}>2024</option>
+        </select>
+      </div>
+
+      <div style={{ marginBottom: "24px" }}>
+        <label htmlFor="month-select" style={{ marginRight: "12px" }}>
+          Mês:
+        </label>
+        <select
+          id="month-select"
+          value={selectedMonth}
+          onChange={handleMonthChange}
+          style={{
+            padding: "8px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          }}
+        >
+          <option value="all">Todos</option>
+          <option value="jan">Janeiro</option>
+          <option value="feb">Fevereiro</option>
+          <option value="mar">Março</option>
+          <option value="apr">Abril</option>
+          <option value="may">Maio</option>
+          <option value="jun">Junho</option>
+          <option value="jul">Julho</option>
+          <option value="aug">Agosto</option>
+          <option value="sep">Setembro</option>
+          <option value="oct">Outubro</option>
+          <option value="nov">Novembro</option>
+          <option value="dec">Dezembro</option>
+        </select>
+      </div>
+
+      <div
+        style={{
+          border: "1px solid #e2e8f0",
+          borderRadius: "8px",
+          padding: "16px",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+          backgroundColor: "white",
+        }}
+      >
+        <h2 style={{ fontSize: "24px", fontWeight: "600", marginBottom: "16px" }}>
+          {chartTitle}
+        </h2>
+        {filteredData.length > 0 ? <Bar data={chartData} /> : <p>No data available for selected filters</p>}
+      </div>
+    </div>
+  );
+};
+
+export default InfluenzaDashboard;
